@@ -1,0 +1,28 @@
+import React from 'react';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
+
+export const PlusButton = ({ setAdd }) => {
+  return (
+    <div style={{ paddingBottom: 20, textAlign: 'center' }}>
+      <Button
+        icon={<PlusCircleOutlined />}
+        onClick={() =>
+          setAdd((p) => [
+            ...p,
+            {
+              descriptif: '',
+              quantite: 0,
+              unite: '',
+              pu: 0,
+              tva: 20,
+              prime: 0,
+            },
+          ])
+        }
+      >
+        Ligne
+      </Button>
+    </div>
+  );
+};
