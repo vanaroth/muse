@@ -29,6 +29,7 @@ import { SimpleForm } from './pages/SimpleForm';
 import { GenererDevis } from './pages/devis/GenererDevis';
 import { BDCForm } from './pages/bdc/BDCForm';
 import { Stock } from './pages/stock/Stock';
+import { Chantier } from './pages/chantier/Chantier';
 
 export const SwitchPrincipal = ({ authorisation }) => (
   <Switch>
@@ -172,8 +173,13 @@ export const SwitchPrincipal = ({ authorisation }) => (
       authorisation={authorisation}
     />
     <PrivateRoute
-      path="/stock/"
+      path="/stock/:mode?"
       children={<Stock />}
+      authorisation={authorisation}
+    />
+    <PrivateRoute
+      path="/chantiers/:id"
+      children={<Chantier />}
       authorisation={authorisation}
     />
     <PrivateRoute
