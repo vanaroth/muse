@@ -15,9 +15,9 @@ export const SearchTable = ({ columns, dataSource, isScroll }) => {
           return Object.entries(ligne).reduce((acc, [k, v]) => {
             console.log('SearchTable', k, v);
             if (v) {
-              return v.toLowerCase().includes(search) ? true : acc || false;
+              return v.toLowerCase().includes(search) ? true : acc;
             }
-            return false;
+            return acc;
           }, false);
         });
   const table = (

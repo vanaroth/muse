@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Tag } from 'antd';
 import 'antd/dist/antd.css';
 
-import { SearchTableContainer } from '../../components/SearchTableContainer';
+import { Container } from '../../components/Container';
+import Title from 'antd/lib/typography/Title';
+import { LoaderData } from '../../components/LoaderData';
+import { Scroll } from '../../components/Scroll';
+import { SearchTable } from '../../components/SearchTable';
+import { makeUrl } from '../devis/functions/makeUrl';
 
 export const AdresseTable = () => {
+  const [data, setData] = useState([]);
   const history = useHistory();
+
   const columns = [
     {
       title: 'Rue',
@@ -53,12 +60,17 @@ export const AdresseTable = () => {
       sortDirections: ['ascend', 'descend'],
     },
   ];
-
+  const url = makeUrl('/api/adresse');
   return (
-    <SearchTableContainer
-      title="Liste des Adresses"
-      columns={columns}
-      urlLoadData="/api/adresse"
-    />
+    <Container style={{ width: 1000, maxWidth: '90vw' }}>
+      <Title level={4} style={{ fontSize: '1.2em' }}>
+        Liste des Adresses
+      </Title>
+      <LoaderData url={url} setData={setData}>
+        <Scroll>
+          <SearchTable columns={columns} dataSource={data} isScroll />
+        </Scroll>
+      </LoaderData>
+    </Container>
   );
 };

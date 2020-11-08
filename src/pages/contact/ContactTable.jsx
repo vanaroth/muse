@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Tag, message } from 'antd';
+import { Button, Tag } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import 'antd/dist/antd.css';
 
 import { Container } from '../../components/Container';
 import { SearchTable } from '../../components/SearchTable';
-import Axios from 'axios';
 import { Scroll } from '../../components/Scroll';
+import { LoaderData } from '../../components/LoaderData';
+import { makeUrl } from '../devis/functions/makeUrl';
 
 export const ContactTable = () => {
   console.log('Contact List 1');
@@ -80,66 +81,18 @@ export const ContactTable = () => {
       sortDirections: ['ascend', 'descend'],
     },
   ];
-
-  useEffect(() => {
-    let ignore = false;
-    async function fetchData() {
-      try {
-        const result = await Axios.get('/api/contact');
-        if (!ignore) {
-          setData(result.data.dataResponse);
-          console.log('Contact List ', result);
-        }
-      } catch (err) {
-        message.error(`Les données n'ont pas pu être chargé`);
-
-        setData([
-          {
-            idContact: '3220',
-            genre: 'M',
-            nom: 'Test',
-            prenom: 'Testy',
-            tel: '0606060606',
-            email: 'testy.test@tt.fr',
-          },
-          {
-            idContact: '3221',
-            genre: 'M',
-            nom: 'rergerg',
-            prenom: '',
-            tel: '0808080808 / 04rgerg erg erg',
-            email: 'testy.test@tt.fr',
-          },
-          {
-            complement_origine: 'OP-202010021841171',
-            creation: '2020-10-16 16:33:24',
-            descriptif: 'M GRIGNON Pascal 0680237371 ',
-            dossier: '',
-            email: 'pascal.grignon@gmail.com',
-            genre: 'M',
-            idContact: '3220',
-            idOrigine: '11',
-            nom: 'GRIGNON',
-            prenom: 'Pascal',
-            tel: '0680237371',
-          },
-        ]);
-      }
-    }
-    fetchData();
-    return () => {
-      ignore = true;
-    };
-  }, []);
+  const url = makeUrl('/api/contact');
 
   return (
     <Container style={{ width: 1000, maxWidth: '90vw' }}>
       <Title level={4} style={{ fontSize: '1.2em' }}>
         Liste des Contacts
       </Title>
-      <Scroll>
-        <SearchTable columns={columns} dataSource={data} isScroll />
-      </Scroll>
+      <LoaderData url={url} setData={setData}>
+        <Scroll>
+          <SearchTable columns={columns} dataSource={data} isScroll />
+        </Scroll>
+      </LoaderData>
     </Container>
   );
 };

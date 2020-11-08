@@ -15,9 +15,10 @@ const { Sider, Content } = Layout;
 function App() {
   const [authorisation, setAuthorisation] = useState({
     isAuthenticated: true,
-    locale: true,
   });
-  window.baseURL = 'http://api.nextsetp.ovh';
+  window.baseURL = 'http://dev.nextsetp.ovh';
+  window.isLocalDevState = true;
+  window.testAcces = '?login=wpeilhon&mdp=xool';
 
   console.log('App authorisation ', authorisation, Date.now());
   return (

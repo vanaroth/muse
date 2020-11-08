@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Table, Select } from 'antd';
+import { Form, Select } from 'antd';
 import 'antd/dist/antd.css';
 import { Container } from '../../components/Container';
-import Axios from 'axios';
-import { Scroll } from '../../components/Scroll';
 import { TableStock } from '../../components/TableStock';
 import { useParams } from 'react-router-dom';
+import { LoaderData } from '../../components/LoaderData';
+import { makeUrl } from '../devis/functions/makeUrl';
 
 const { Option } = Select;
 
@@ -14,59 +14,20 @@ export const Stock = () => {
   const [data, setData] = useState([]);
   const [serverData, setServerData] = useState();
   const { mode } = useParams();
-
-  useEffect(() => {
-    const ignore = false;
-
-    async function fetchData() {
-      try {
-        const result = await Axios.get('/api/stock');
-        const { dataResponse } = result.data;
-        const liste_stock =
-          mode === 'form'
-            ? dataResponse.liste_stock.map((produit) => ({
-                ...produit,
-                total: 0,
-              }))
-            : dataResponse.liste_stock;
-        if (!ignore) setServerData(liste_stock);
-      } catch (err) {
-        console.log('Erreur de Chargement Stock', err);
-      }
-    }
-
-    fetchData();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
+  const url = makeUrl('/api/stock');
 
   useEffect(() => {
     console.log('activite', activite);
-    setData(
-      activite != 0
-        ? serverData.filter((i) => {
-            console.log(
-              'i',
-              i.nom,
-              i.activites,
-              i.activites && i.activites.indexOf(activite) >= 0
-            );
-            return i.activites !== null && i.activites.indexOf(activite) >= 0;
-          })
-        : serverData
-    );
+    setData(filterData(activite, serverData));
   }, [serverData, activite]);
 
   return (
     <Container title="Stock" style={{ width: 1000, maxWidth: '90vw' }}>
       <SelectActivite setActivite={setActivite} />
-      <Scroll>
-        <div style={{ minWidth: 400 }}>
-          <TableStock dataSource={data} editMode={mode === 'form'} />
-        </div>
-      </Scroll>
+
+      <LoaderData url={url} setData={setServerData}>
+        <TableStock dataSource={data} editMode={mode === 'form'} />
+      </LoaderData>
     </Container>
   );
 };
@@ -87,4 +48,18 @@ const SelectActivite = ({ setActivite }) => {
       </Form.Item>
     </Form>
   );
+};
+
+const filterData = (activite, data) => {
+  return activite != 0
+    ? data.liste_stock.filter((i) => {
+        console.log(
+          'i',
+          i.nom,
+          i.activites,
+          i.activites && i.activites.indexOf(activite) >= 0
+        );
+        return i.activites !== null && i.activites.indexOf(activite) >= 0;
+      })
+    : data;
 };
