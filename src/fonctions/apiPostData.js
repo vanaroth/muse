@@ -1,6 +1,7 @@
 import Axios from 'axios';
 
 export const apiPostData = (url, method, data, onSuccess, onFailure, next) => {
+  console.log({ method, url, data });
   async function fetchData() {
     try {
       console.log('apiPostData try');

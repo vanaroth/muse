@@ -14,11 +14,13 @@ export const Stock = () => {
   const [data, setData] = useState([]);
   const [serverData, setServerData] = useState();
   const { mode } = useParams();
-  const url = makeUrl('/api/stock');
+  const url = '/api/stock';
 
   useEffect(() => {
     console.log('activite', activite);
-    setData(filterData(activite, serverData));
+    setData(
+      filterData(activite, serverData ? serverData.liste_stock : serverData)
+    );
   }, [serverData, activite]);
 
   return (

@@ -6,13 +6,12 @@ import TextArea from 'antd/lib/input/TextArea';
 import { formatToObj } from '../../fonctions/formatToObj';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { STDForm } from '../../components/STDForm';
+import { makeUrl } from '../devis/functions/makeUrl';
 
 export const AdresseForm = () => {
   const history = useHistory();
   const location = useLocation();
   const { id } = useParams();
-
-  console.log('AdresseForm', location);
 
   if (id === undefined && (!location.data || !location.data.ancestor.id)) {
     message.info('Pour ajouter une adresse il faut passser par contact');
@@ -21,10 +20,31 @@ export const AdresseForm = () => {
 
   const nextParams = { url: '/opportunite/form', state: false };
   const getUrl = '/api/adresse';
-  const postUrl = '/api/adresse/';
+  const postUrl = '/api/adresse';
   const passerEtape = { isShow: false };
   const title = 'Adresse';
 
+  const onSuccess = (response, next) =>
+    onSuccessPost(response, next, history, 'adresse');
+  const onFailure = () => {
+    console.log(`Une Erreur est survenue au moment de l'envoie des données`);
+  };
+  return (
+    <AdresseFormUI
+      {...{
+        nextParams,
+        getUrl,
+        postUrl,
+        onSuccess,
+        onFailure,
+        passerEtape,
+        title,
+      }}
+    />
+  );
+};
+
+const AdresseFormUI = (props) => {
   const radios = {
     type_stationnement: formatToObj([
       'parking',
@@ -35,36 +55,9 @@ export const AdresseForm = () => {
     ouiNonNeSaitPAs: ['oui', 'non', 'ne sait pas'],
     ouiNon: formatToObj(['oui', 'non']),
   };
-  const onSuccess = (response, next) => {
-    console.log('onSuccess', response);
-    const { dataResponse } = response.data;
-    if (dataResponse.ajout) {
-      next && next.state
-        ? history.push({
-            pathname: next.url,
-            data: { ancestor: { type: 'contact', id: dataResponse.id } },
-          })
-        : history.push(`/contact/${dataResponse.id ? dataResponse.id : ''}`);
-    } else {
-      message.warning("Les données n'ont pas été ajouté !");
-    }
-  };
-
-  const onFailure = () => {
-    console.log(`Une Erreur est survenue au moment de l'envoie des données`);
-  };
+  console.log('ui', props);
   return (
-    <STDForm
-      {...{
-        nextParams,
-        getUrl,
-        postUrl,
-        onSuccess,
-        onFailure,
-        passerEtape,
-        title,
-      }}
-    >
+    <STDForm {...props}>
       <Form.Item name="adresse" label="Rue">
         <Input placeholder="Rue" />
       </Form.Item>
@@ -114,4 +107,28 @@ export const AdresseForm = () => {
       </Form.Item>
     </STDForm>
   );
+};
+
+const onSuccessPost = (response, next, history, baseLink) => {
+  console.log('onSuccess', response);
+
+  const { dataResponse, isLogin, ajout } = response.data;
+  const suivant = (baseLink) => {
+    next && next.state
+      ? history.push({
+          pathname: makeUrl(next.url),
+          data: { ancestor: { type: baseLink, id: dataResponse.id } },
+        })
+      : history.push(
+          makeUrl(`/${baseLink}/${dataResponse.id ? dataResponse.id : ''}`)
+        );
+  };
+
+  const needSignout = () => {
+    if (isLogin === false) history.push('/signout');
+  };
+  needSignout();
+  ajout
+    ? suivant(baseLink)
+    : message.warning("Les données n'ont pas été ajouté !");
 };

@@ -9,6 +9,7 @@ import { apiPostData } from '../fonctions/apiPostData';
 import { ButtonPasserEtape } from '../components/ButtonPasserEtape';
 import { Container } from './Container';
 import Title from 'antd/lib/typography/Title';
+import { makeUrl } from '../pages/devis/functions/makeUrl';
 
 export const STDForm = ({
   nextParams,
@@ -32,7 +33,7 @@ export const STDForm = ({
 
   const postData = (values) => {
     const method = id !== undefined ? 'post' : 'put';
-    const url = `${postUrl}${id ? '/' + id : ''}`;
+    const url = makeUrl(`${postUrl}${id ? '/' + id : ''}`);
     console.log('url', url);
 
     const finalValue = externalData ? { ...values, ...externalData } : values;

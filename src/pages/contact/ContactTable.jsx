@@ -81,7 +81,7 @@ export const ContactTable = () => {
       sortDirections: ['ascend', 'descend'],
     },
   ];
-  const url = makeUrl('/api/contact');
+  const url = '/api/contact';
 
   return (
     <Container style={{ width: 1000, maxWidth: '90vw' }}>

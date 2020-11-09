@@ -60,7 +60,7 @@ export const AdresseTable = () => {
       sortDirections: ['ascend', 'descend'],
     },
   ];
-  const url = makeUrl('/api/adresse');
+  const url = '/api/adresse';
   return (
     <Container style={{ width: 1000, maxWidth: '90vw' }}>
       <Title level={4} style={{ fontSize: '1.2em' }}>
