@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Divider, List, Modal } from 'antd';
+import { Divider, List, Modal, message } from 'antd';
 import 'antd/dist/antd.css';
 import { Container } from '../../components/Container';
 
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useHistory } from 'react-router-dom';
 import Axios from 'axios';
 
 export const Recherche = () => {
   const location = useLocation();
+  const history = useHistory();
   console.log('location', location);
   const [search, setSearch] = useState(false);
   const [categorie, setCategorie] = useState(false);
@@ -25,14 +26,15 @@ export const Recherche = () => {
     async function fetchData() {
       try {
         const result = await Axios.post('/api/recherche', { value: search });
+        const { dataResponse, isLogin } = result.data;
+        if (isLogin === false) history.push('/signout');
         if (!ignore) {
-          setData(result.data.dataResponse);
+          setData(dataResponse);
         }
       } catch (error) {
-        Modal.error({
-          title: 'Problème de connexion au server',
-          content: JSON.stringify(error),
-        });
+        message.error(
+          'Problème de connexion au server ' + JSON.stringify(error)
+        );
       }
     }
     fetchData();
@@ -43,43 +45,14 @@ export const Recherche = () => {
 
   return (
     <Container
-      title={
-        <>
-          Recherche :{' '}
-          <i>
-            {search} | {categorie}
-          </i>
-        </>
-      }
+      title={<SearchTitle search={search} categorie={categorie} />}
       style={{ width: '80vw', minHeight: 300, maxWidth: 1300 }}
     >
       {data ? (
         <>
-          {(categorie === 'tous' || categorie === 'contact') && (
-            <Module
-              data={data.contact || []}
-              name={
-                'Contact (' + (data.contact ? data.contact.length : 0) + ')'
-              }
-              link="contact"
-            />
-          )}
-          {(categorie === 'tous' || categorie === 'adresse') && (
-            <Module
-              data={data.adresse || []}
-              name={
-                'Adresse (' + (data.adresse ? data.adresse.length : 0) + ')'
-              }
-              link="adresse"
-            />
-          )}
-          {(categorie === 'tous' || categorie === 'stock') && (
-            <Module
-              data={data.stock || []}
-              name={'Stock (' + (data.stock ? data.stock.length : 0) + ')'}
-              link="stock"
-            />
-          )}
+          <ContactCategorie data={data.contact} categorie={categorie} />
+          <AdresseCategorie data={data.adresse} categorie={categorie} />
+          <StockCategorie data={data.stock} categorie={categorie} />
         </>
       ) : (
         <List />
@@ -88,7 +61,7 @@ export const Recherche = () => {
   );
 };
 
-const Module = ({ data, name, link }) => {
+const Module = ({ data = [], name, link }) => {
   if (data.length > 0)
     return (
       <>
@@ -104,4 +77,67 @@ const Module = ({ data, name, link }) => {
       </>
     );
   else return null;
+};
+const ContactCategorie = ({ data = [], categorie }) => {
+  return (
+    <Categorie
+      data={data}
+      name="Contact"
+      link="contact"
+      nomCategorie="contact"
+      actuelCategorie={categorie}
+    />
+  );
+};
+const AdresseCategorie = ({ data = [], categorie }) => {
+  return (
+    <Categorie
+      data={data}
+      name="Adresse"
+      link="adresse"
+      nomCategorie="adresse"
+      actuelCategorie={categorie}
+    />
+  );
+};
+const StockCategorie = ({ data = [], categorie }) => {
+  return (
+    <Categorie
+      data={data}
+      name="Stock"
+      link="stock"
+      nomCategorie="stock"
+      actuelCategorie={categorie}
+    />
+  );
+};
+
+const Categorie = ({
+  data = [],
+  name,
+  link,
+  nomCategorie,
+  actuelCategorie,
+}) => {
+  return (
+    <>
+      {(actuelCategorie === 'tous' || actuelCategorie === nomCategorie) && (
+        <Module
+          data={data}
+          name={name + ' (' + (data ? data.length : 0) + ')'}
+          link={link}
+        />
+      )}
+    </>
+  );
+};
+const SearchTitle = ({ search, categorie }) => {
+  return (
+    <>
+      Recherche :{' '}
+      <i>
+        {search} | {categorie}
+      </i>
+    </>
+  );
 };

@@ -13,6 +13,7 @@ export const useLoadApiData = (url, setData) => {
     async function fetchData() {
       try {
         const result = await Axios.get(url);
+        console.log('dataResponse result', result);
         const { dataResponse, isLogin } = result.data;
         if (isLogin === false) history.push('/signout');
 
